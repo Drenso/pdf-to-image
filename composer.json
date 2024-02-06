@@ -1,14 +1,13 @@
 {
-    "name": "spatie/pdf-to-image",
+    "name": "drenso/pdf-to-image",
     "description": "Convert a pdf to an image",
     "keywords": [
-        "spatie",
         "pdf-to-image",
         "pdf",
         "convert",
         "image"
     ],
-    "homepage": "https://github.com/spatie/pdf-to-image",
+    "homepage": "https://github.com/drenso/pdf-to-image",
     "license": "MIT",
     "authors": [
         {
@@ -19,20 +18,21 @@
         }
     ],
     "require": {
-        "php" : "^7.2|^8.0",
-        "ext-imagick" : "*"
+        "php" : "^8.2",
+        "ext-gd": "*",
+        "ext-random": "*"
     },
     "require-dev": {
         "pestphp/pest": "^1.21"
     },
     "autoload": {
         "psr-4": {
-            "Spatie\\PdfToImage\\": "src"
+            "Drenso\\PdfToImage\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Spatie\\PdfToImage\\Test\\": "tests"
+            "Drenso\\PdfToImage\\Test\\": "tests"
         }
     },
     "scripts": {

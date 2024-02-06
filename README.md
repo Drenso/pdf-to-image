@@ -8,25 +8,15 @@
 
 This package provides an easy to work with class to convert PDF's to images.
 
-Spatie is a webdesign agency in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/pdf-to-image.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/pdf-to-image)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
-
 ## Requirements
 
-You should have [Imagick](http://php.net/manual/en/imagick.setresolution.php) and [Ghostscript](http://www.ghostscript.com/) installed. See [issues regarding Ghostscript](#issues-regarding-ghostscript).
+You should have [Ghostscript](http://www.ghostscript.com/) installed. See [issues regarding Ghostscript](#issues-regarding-ghostscript).
 
 ## Installation
 
 The package can be installed via composer:
 ``` bash
-composer require spatie/pdf-to-image
+composer require drenso/pdf-to-image
 ```
 
 ## Usage
@@ -34,7 +24,7 @@ composer require spatie/pdf-to-image
 Converting a pdf to an image is easy.
 
 ```php
-$pdf = new Spatie\PdfToImage\Pdf($pathToPdf);
+$pdf = new Drenso\PdfToImage\Pdf($pathToPdf);
 $pdf->saveImage($pathToWhereImageShouldBeStored);
 ```
 
@@ -56,19 +46,19 @@ $pdf->setPage(2)
 
 You can override the output format:
 ```php
-$pdf->setOutputFormat('png')
+$pdf->setOutputFormat(ExportFormatEnum::PNG)
     ->saveImage($pathToWhereImageShouldBeStored); //the output wil be a png, no matter what
 ```
 
-You can set the quality of compression from 0 to 100:
+You can set the quality of compression. This depends on the export format, see the GD documentation for more info:
 ```php
 $pdf->setCompressionQuality(100); // sets the compression quality to maximum
 ```
 
-You can specify the width of the resulting image:
+You can specify the width to scale down the resulting image:
 ```php
 $pdf
-   ->width(400)
+   ->setWidth(400)
    ->saveImage($pathToWhereImageShouldBeStored);
 ```
 
@@ -104,21 +94,8 @@ Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recen
 
 Please see [CONTRIBUTING](https://github.com/spatie/.github/blob/main/CONTRIBUTING.md) for details.
 
-## Security
-
-If you've found a bug regarding security please mail [security@spatie.be](mailto:security@spatie.be) instead of using the issue tracker.
-
-## Postcardware
-
-You're free to use this package, but if it makes it to your production environment we highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using.
-
-Our address is: Spatie, Kruikstraat 22, 2018 Antwerp, Belgium.
-
-We publish all received postcards [on our company website](https://spatie.be/en/opensource/postcards).
-
 ## Credits
 
-- [Freek Van der Herten](https://github.com/spatie)
 - [All Contributors](../../contributors)
 
 ## License

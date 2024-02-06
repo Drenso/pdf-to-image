@@ -2,6 +2,11 @@
 
 All notable changes to `pdf-to-image` will be documented in this file
 
+## 3.0.0 - 2024-xx-xx
+- No longer use imagick for processing, use GD instead
+- Colorspace and merging of layers is no longer available
+- Refactor export formats to enum
+- Renaming/refactoring of methods
 
 ## 2.2.0 - 2022-03-08
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\PdfToImage\Exceptions;
+namespace Drenso\PdfToImage\Exceptions;
 
 use Exception;
 
