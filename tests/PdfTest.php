@@ -1,9 +1,8 @@
 <?php
 
-use Spatie\PdfToImage\Exceptions\InvalidFormat;
-use Spatie\PdfToImage\Exceptions\PageDoesNotExist;
-use Spatie\PdfToImage\Exceptions\PdfDoesNotExist;
-use Spatie\PdfToImage\Pdf;
+use Drenso\PdfToImage\Exceptions\PageDoesNotExist;
+use Drenso\PdfToImage\Exceptions\PdfDoesNotExist;
+use Drenso\PdfToImage\Pdf;
 
 beforeEach(function () {
     $this->testFile = __DIR__.'/files/test.pdf';
@@ -15,10 +14,6 @@ beforeEach(function () {
 it('will throw an exception when try to convert a non existing file', function () {
     new Pdf('pdfdoesnotexists.pdf');
 })->throws(PdfDoesNotExist::class);
-
-it('will throw an exception when trying to convert an invalid file type', function () {
-    (new Pdf($this->testFile))->setOutputFormat('bla');
-})->throws(InvalidFormat::class);
 
 it('will throw an exception when passed an invalid page number', function ($invalidPage) {
     (new Pdf($this->testFile))->setPage(100);
@@ -33,56 +28,25 @@ it('will correctly return the number of pages in pdf file', function () {
 });
 
 it('will accept a custom specified resolution', function () {
-    $image = (new Pdf($this->testFile))
-        ->setResolution(150)
-        ->getImageData('test.jpg')
-        ->getImageResolution();
+    $image = (new Pdf($this->testFile, resolution: 150))
+        ->getImageData('test.jpg');
 
-    expect($image['x'])->toEqual(150);
-    expect($image['y'])->toEqual(150);
+    expect(imageresolution($image)[0])->toEqual(150)
+        ->and(imageresolution($image)[1])->toEqual(150);
 });
 
 it('will convert a specified page', function () {
-    $imagick = (new Pdf($this->multipageTestFile))
+    $image = (new Pdf($this->multipageTestFile))
         ->setPage(2)
         ->getImageData('page-2.jpg');
 
-    expect($imagick)->toBeInstanceOf(Imagick::class);
-});
-
-it('will accpect a specified file type and convert to it', function () {
-    $imagick = (new Pdf($this->testFile))
-        ->setOutputFormat('png')
-        ->getImageData('test.png');
-
-    expect($imagick->getFormat())->toEqual('png');
-    expect($imagick->getFormat())->not->toEqual('jpg');
-});
-
-it('can accepct a layer', function () {
-    $image = (new Pdf($this->testFile))
-        ->setLayerMethod(Imagick::LAYERMETHOD_FLATTEN)
-        ->setResolution(72)
-        ->getImageData('test.jpg')
-        ->getImageResolution();
-
-    expect($image['x'])->toEqual(72);
-    expect($image['y'])->toEqual(72);
-});
-
-it('will set compression quality', function () {
-    $imagick = (new Pdf($this->testFile))
-        ->setCompressionQuality(99)
-        ->getImageData('test.jpg');
-
-    expect($imagick->getCompressionQuality())->toEqual(99);
+    expect($image)->toBeInstanceOf(GdImage::class);
 });
 
 it('will create a thumbnail at specified width', function () {
-    $imagick = (new Pdf($this->multipageTestFile))
-       ->width(400)
-       ->getImageData('test.jpg')
-       ->getImageGeometry();
+    $image = (new Pdf($this->multipageTestFile))
+       ->setWidth(400)
+       ->getImageData('test.jpg');
 
-    expect($imagick['width'])->toBe(400);
+    expect(imagesx($image))->toBe(400);
 });
