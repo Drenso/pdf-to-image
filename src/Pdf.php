@@ -7,26 +7,26 @@ use Drenso\PdfToImage\Exceptions\PageDoesNotExist;
 use Drenso\PdfToImage\Exceptions\PdfDoesNotExist;
 use GdImage;
 use Random\Engine\Secure;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Process\Process;
 
 class Pdf
 {
-    protected string $cacheDir;
+    protected ?string $cacheDir = null;
     protected ?int $width = null;
     protected ?ExportFormatEnum $outputFormat = null;
     protected int $page = 1;
     protected int $compressionQuality = -1;
     private ?int $numberOfPages = null;
+    private Filesystem $filesystem;
 
     public function __construct(private readonly string $pdfFile, protected readonly int $resolution = 144)
     {
-        if (! file_exists($pdfFile)) {
+        $this->filesystem = new Filesystem();
+        if (! $this->filesystem->exists($pdfFile)) {
             throw new PdfDoesNotExist("File `{$pdfFile}` does not exist");
         }
-
-        // Convert to PNG files, so GD can be used for the following processing
-        $this->cacheDir = '/tmp/pdftoimage/' . bin2hex((new Secure())->generate());
-        @mkdir($this->cacheDir, recursive: true);
-        exec(sprintf('gs -dSAFER -dBATCH -sDEVICE=png16m -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r%s -sOutputFile=%s %s', $this->resolution, $this->cacheDir . '/%03d.png', $this->pdfFile));
     }
 
     public function setWidth(int $width): self
@@ -61,8 +61,8 @@ class Pdf
     public function getNumberOfPages(): int
     {
         if ($this->numberOfPages === null) {
-            $files = scandir($this->cacheDir);
-            $this->numberOfPages = count(array_filter($files, fn (string $filename) => str_ends_with($filename, '.png')));
+            $this->prepareImages();
+            $this->numberOfPages = (new Finder())->in($this->cacheDir)->name('*.png')->count();
         }
 
         return $this->numberOfPages;
@@ -88,7 +88,7 @@ class Pdf
 
         return array_map(function ($pageNumber) use ($directory, $prefix) {
             $this->setPage($pageNumber);
-            $destination = "{$directory}/{$prefix}{$pageNumber}.{$this->outputFormat}";
+            $destination = "{$directory}".DIRECTORY_SEPARATOR."{$prefix}{$pageNumber}.{$this->outputFormat}";
             $this->saveImage($destination);
 
             return $destination;
@@ -97,8 +97,9 @@ class Pdf
 
     public function getImageData(string $pathToImage): GdImage
     {
+        $this->prepareImages();
         $this->outputFormat ??= ExportFormatEnum::fromFileName($pathToImage);
-        $pageName = $this->cacheDir . sprintf('/%03d.png', $this->page);
+        $pageName = $this->cacheDir . DIRECTORY_SEPARATOR . sprintf('%03d.png', $this->page);
         $originalImage = imagecreatefrompng($pageName);
 
         if ($this->width === null) {
@@ -111,7 +112,7 @@ class Pdf
             return $originalImage;
         }
         // Calculate scaled height
-        $newHeight = $imageSize[1] * ($this->width / $imageSize[0]);
+        $newHeight = round((float)$imageSize[1] * ($this->width / $imageSize[0]));
         // Resize in new image
         $resizedImage = imagecreatetruecolor($this->width, $newHeight);
         imagecopyresampled($resizedImage, $originalImage, 0, 0, 0, 0, $this->width, $newHeight, $imageSize[0], $imageSize[1]);
@@ -124,5 +125,28 @@ class Pdf
         $this->compressionQuality = $compressionQuality;
 
         return $this;
+    }
+
+    public function prepareImages(): void
+    {
+        if ($this->cacheDir) {
+            return;
+        }
+
+        // Convert to PNG files, so GD can be used for the following processing
+        $this->cacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'pdftoimage' . DIRECTORY_SEPARATOR . bin2hex((new Secure())->generate());
+        $this->filesystem->mkdir($this->cacheDir);
+        (new Process([
+            'gs',
+            '-dSAFER',
+            '-dBATCH',
+            '-dNOPAUSE',
+            '-sDEVICE=png16m',
+            '-dTextAlphaBits=4',
+            '-dGraphicsAlphaBits=4',
+            '-r' . $this->resolution,
+            '-sOutputFile=' . $this->cacheDir . DIRECTORY_SEPARATOR . '%03d.png',
+            $this->pdfFile])
+        )->mustRun();
     }
 }

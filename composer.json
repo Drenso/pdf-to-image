@@ -13,14 +13,26 @@
         {
             "name": "Freek Van der Herten",
             "email": "freek@spatie.be",
-            "homepage": "https://spatie.be",
-            "role": "Developer"
+            "homepage": "https://spatie.be"
+        },
+        {
+            "name": "Tobias Feijten",
+            "email": "tobias@drenso.nl",
+            "homepage": "https://drenso.nl"
+        },
+        {
+            "name": "Bob van de Vijver",
+            "email": "bob@drenso.nl",
+            "homepage": "https://drenso.nl"
         }
     ],
     "require": {
-        "php" : "^8.2",
+        "php": ">=8.2",
         "ext-gd": "*",
-        "ext-random": "*"
+        "ext-random": "*",
+        "symfony/filesystem": "^5.4 || ^6.4 || ^7.0",
+        "symfony/finder": "^5.4 || ^6.4 || ^7.0",
+        "symfony/process": "^5.4 || ^6.4 || ^7.0"
     },
     "require-dev": {
         "pestphp/pest": "^1.21"

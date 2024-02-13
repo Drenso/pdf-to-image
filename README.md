@@ -6,7 +6,7 @@
 [![StyleCI](https://styleci.io/repos/38419604/shield?branch=master)](https://styleci.io/repos/38419604)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/pdf-to-image.svg?style=flat-square)](https://packagist.org/packages/spatie/pdf-to-image)
 
-This package provides an easy to work with class to convert PDF's to images.
+This package provides an easy to work with class to convert PDF's to images. It is based on the [`spatie/pdf-to-image`](https://github.com/spatie/pdf-to-image) library, which relied on Imagick for the conversion. This library relies on GD instead.
 
 ## Requirements
 
@@ -50,7 +50,7 @@ $pdf->setOutputFormat(ExportFormatEnum::PNG)
     ->saveImage($pathToWhereImageShouldBeStored); //the output wil be a png, no matter what
 ```
 
-You can set the quality of compression. This depends on the export format, see the GD documentation for more info:
+You can set the quality of compression (this depends on the export format, see the GD documentation for more details):
 ```php
 $pdf->setCompressionQuality(100); // sets the compression quality to maximum
 ```

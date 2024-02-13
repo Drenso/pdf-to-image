@@ -12,10 +12,10 @@ beforeEach(function () {
 
 
 it('will throw an exception when try to convert a non existing file', function () {
-    new Pdf('pdfdoesnotexists.pdf');
+    new Pdf('pdfdoesnotexist.pdf');
 })->throws(PdfDoesNotExist::class);
 
-it('will throw an exception when passed an invalid page number', function ($invalidPage) {
+it('will throw an exception when passed an invalid page number', function () {
     (new Pdf($this->testFile))->setPage(100);
 })
 ->throws(PageDoesNotExist::class)
@@ -31,8 +31,9 @@ it('will accept a custom specified resolution', function () {
     $image = (new Pdf($this->testFile, resolution: 150))
         ->getImageData('test.jpg');
 
-    expect(imageresolution($image)[0])->toEqual(150)
-        ->and(imageresolution($image)[1])->toEqual(150);
+    $resolution = imageresolution($image);
+    expect($resolution[0])->toEqual(150)
+        ->and($resolution[1])->toEqual(150);
 });
 
 it('will convert a specified page', function () {
@@ -48,5 +49,6 @@ it('will create a thumbnail at specified width', function () {
        ->setWidth(400)
        ->getImageData('test.jpg');
 
-    expect(imagesx($image))->toBe(400);
+    expect(imagesx($image))->toBe(400)
+        ->and(imagesy($image))->toBe(283); // round(210*400/297)
 });
